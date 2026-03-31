@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Job Application Tracker</h1>
+            <div class="header-actions">
+                <button id="dashboardToggle" class="btn btn-secondary">📊 Dashboard</button>
+                <button id="addJobBtn" class="btn btn-primary">+ Add Application</button>
+                <button id="filterBtn" class="btn btn-secondary">Filter</button>
+                <button id="exportBtn" class="btn btn-secondary">📥 Export</button>
+                <button id="darkModeToggle" class="btn btn-secondary">🌙</button>
+            </div>
+        </header>
+
+        <!-- Interactive Dashboard Section -->
+        <section id="dashboardSection" class="dashboard-section" style="display: none;">
+            <div class="dashboard-header">
+                <h2>Interactive Dashboard</h2>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="overview">Overview</button>
+                    <button class="view-btn" data-view="timeline">Timeline</button>
+                    <button class="view-btn" data-view="analytics">Analytics</button>
+                </div>
+            </div>
+
+            <!-- Overview View -->
+            <div id="overviewView" class="dashboard-view active">
+                <div class="stats-grid">
+                    <div class="stat-card enhanced">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalApps">0</div>
+                            <div class="stat-label">Total Applications</div>
+                            <div class="stat-change" id="totalChange">+0 this week</div>
+                        </div>
+                    </div>
+                    <div class="stat-card enhanced">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="interviewRate">0%</div>
+                            <div class="stat-label">Interview Rate</div>
+                            <div class="stat-change" id="interviewChange">+0% this week</div>
+                        </div>
+                    </div>
+                    <div class="stat-card enhanced">
+                        <div class="stat-icon">🎉</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="offerCount">0</div>
+                            <div class="stat-label">Offers</div>
+                            <div class="stat-change" id="offerChange">+0 this week</div>
+                        </div>
+                    </div>
+                    <div class="stat-card enhanced">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="appliedCount">0</div>
+                            <div class="stat-label">Applied</div>
+                            <div class="stat-change" id="appliedChange">+0 this week</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Application Status Distribution</h3>
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Application Timeline</h3>
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="insights-container">
+                    <div class="insight-card">
+                        <h3>🏢 Top Companies</h3>
+                        <div id="topCompanies"></div>
+                    </div>
+                    <div class="insight-card">
+                        <h3>💼 Popular Roles</h3>
+                        <div id="popularRoles"></div>
+                    </div>
+                    <div class="insight-card">
+                        <h3>📈 Success Rate</h3>
+                        <div id="successMetrics"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline View -->
+            <div id="timelineView" class="dashboard-view">
+                <div class="timeline-container">
+                    <h3>Application Timeline</h3>
+                    <div id="timelineContent"></div>
+                </div>
+            </div>
+
+            <!-- Analytics View -->
+            <div id="analyticsView" class="dashboard-view">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>Company Analysis</h3>
+                        <canvas id="companyChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Role Distribution</h3>
+                        <canvas id="roleChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Monthly Progress</h3>
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    <div class="analytics-card">
+                        <h3>Response Analysis</h3>
+                        <div id="responseMetrics"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Dashboard -->
+        <section class="stats-dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalApps">0</div>
+                <div class="stat-label">Total Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="interviewRate">0%</div>
+                <div class="stat-label">Interview Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="offerCount">0</div>
+                <div class="stat-label">Offers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="appliedCount">0</div>
+                <div class="stat-label">Applied</div>
+            </div>
+        </section>
+
+        <!-- Filter Section -->
+        <section class="filter-section" id="filterSection" style="display: none;">
+            <div class="filter-controls">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="🔍 Search applications..." class="search-input">
+                    <div id="searchSuggestions" class="search-suggestions"></div>
+                </div>
+                <input type="text" id="companyFilter" placeholder="Filter by company...">
+                <input type="text" id="roleFilter" placeholder="Filter by role...">
+                <select id="statusFilter" class="status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="applied">Applied</option>
+                    <option value="interview">Interview</option>
+                    <option value="offer">Offer</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <button id="clearFilterBtn" class="btn btn-secondary">Clear</button>
+            </div>
+        </section>
+
+        <!-- Kanban Board -->
+        <main class="kanban-board">
+            <div class="column" data-status="applied">
+                <div class="column-header">
+                    <h3>Applied</h3>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="column-cards" id="applied-cards">
+                    <!-- Cards will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="column" data-status="interview">
+                <div class="column-header">
+                    <h3>Interview</h3>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="column-cards" id="interview-cards">
+                    <!-- Cards will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="column" data-status="offer">
+                <div class="column-header">
+                    <h3>Offer</h3>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="column-cards" id="offer-cards">
+                    <!-- Cards will be added here dynamically -->
+                </div>
+            </div>
+
+            <div class="column" data-status="rejected">
+                <div class="column-header">
+                    <h3>Rejected</h3>
+                    <span class="column-count">0</span>
+                </div>
+                <div class="column-cards" id="rejected-cards">
+                    <!-- Cards will be added here dynamically -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Adding/Editing Job Applications -->
+    <div id="jobModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add Job Application</h2>
+            <form id="jobForm">
+                <div class="form-group">
+                    <label for="company">Company *</label>
+                    <input type="text" id="company" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role *</label>
+                    <input type="text" id="role" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location">
+                </div>
+                <div class="form-group">
+                    <label for="salary">Salary</label>
+                    <input type="text" id="salary">
+                </div>
+                <div class="form-group">
+                    <label for="appliedDate">Applied Date</label>
+                    <input type="date" id="appliedDate">
+                </div>
+                <div class="form-group">
+                    <label for="interviewDate">Interview Date</label>
+                    <input type="date" id="interviewDate">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status">
+                        <option value="applied">Applied</option>
+                        <option value="interview">Interview</option>
+                        <option value="offer">Offer</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
